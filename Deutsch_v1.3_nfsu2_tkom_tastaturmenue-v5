@@ -1601,7 +1601,11 @@
   const gNos = section("NOS");
   mkRow(gNos, "NITRO AUFFÜLLEN", "fillNos", { bind: "fillNos" });
   const infNosBtn = mkRow(gNos, "UNBEGRENZT NOS", "infNos", { bind: "infNos", state: "AUS" });
-  infNosBtn.firstChild.innerHTML = 'UNBEGRENZT NOS <span style="color:#ef4444;font-weight:700">(DETECTED)</span>';
+  const detSpan = document.createElement("span");
+  detSpan.textContent = " (DETECTED)";
+  detSpan.style.color = "#ef4444";
+  detSpan.style.fontWeight = "700";
+  infNosBtn.firstChild.appendChild(detSpan);
   const boostBtn = mkRow(gNos, "NOS BOOST", "boost", { bind: "boost", state: "AUS" });
   const boostS = mkSlider(gNos, "Leistung", BOOST_MIN, BOOST_MAX, BOOST_STEP, boostKmh,
     v => "+" + v + " km/h", v => { boostKmh = v; }, ["powerDown", "powerUp"]);
