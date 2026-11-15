@@ -88,7 +88,6 @@
 
   const DEFAULT_BINDS = {
     boost: "Digit5",
-    infNos: "KeyN",
     fillNos: "KeyB",
     jump: "Digit6",
     stop: "Digit7",
@@ -101,7 +100,6 @@
     jumpUp: "Period",
     spin: "KeyZ",
     barrel: "KeyU",
-    showoff: "KeyY",
     forward2: "KeyF",
     help: "KeyK",
     panel: "Insert",
@@ -109,7 +107,6 @@
   };
   const BIND_ACTIONS = [
     ["boost", "NOS BOOST"],
-    ["infNos", "UNBEGRENZT NOS"],
     ["fillNos", "NITRO AUFFÜLLEN"],
     ["jump", "SPRUNG"],
     ["stop", "VOLLBREMSUNG"],
@@ -123,7 +120,6 @@
     ["jumpUp", "SPRUNG POWER +"],
     ["spin", "DREHUNG (SPIN)"],
     ["barrel", "ROLLE (BARREL ROLL)"],
-    ["showoff", "SHOWOFF"],
     ["help", "HILFE"],
     ["panel", "TRAINER PANEL"],
     ["shot", "UI AUSBLENDEN (SCREENSHOT)"]
@@ -197,7 +193,7 @@
     "",
     "Tastaturbelegung (Klicke auf eine Taste im Panel zum Ändern)",
     "  " + codeLabel(BINDS.boost) + "  NOS Boost an/aus",
-    "  " + codeLabel(BINDS.infNos) + "  Unbegrenzt NOS an/aus",
+    "  Unbegrenzt NOS (DETECTED): nur per Mausklick im Menü",
     "  " + codeLabel(BINDS.fillNos) + "  Nitro auffüllen",
     "  " + codeLabel(BINDS.jump) + "  Sprung",
     "  " + codeLabel(BINDS.stop) + "  Sofort anhalten",
@@ -210,7 +206,7 @@
     "  " + codeLabel(BINDS.panel) + "  Panel anzeigen/verstecken",
     "  " + codeLabel(BINDS.spin) + "  Drehung (Spin) an/aus",
     "  " + codeLabel(BINDS.barrel) + "  Rolle (Barrel Roll) an/aus",
-    "  " + codeLabel(BINDS.showoff) + "  Showoff an/aus (Rauch, Flammen)",
+    "  Showoff (DETECTED): nur per Mausklick im Menü (Rauch, Flammen)",
     "  " + codeLabel(BINDS.help) + "  Diese Hilfe anzeigen/verstecken",
     "  Alt gedrückt halten  NOS dauerhaft aktiv halten",
     "",
@@ -1628,7 +1624,19 @@
       b._state = s;
       b.appendChild(s);
     }
-    b.addEventListener("click", ev => { ev.preventDefault(); act(action); paint(performance.now(), true); b.blur(); });
+    if (opts.mouseOnly) {
+      b.tabIndex = -1;
+      b.addEventListener("keydown", ev => {
+        if (ev.key === "Enter" || ev.key === " ") ev.preventDefault();
+      });
+    }
+    b.addEventListener("click", ev => {
+      ev.preventDefault();
+      if (opts.mouseOnly && ev.detail === 0) return;
+      act(action);
+      paint(performance.now(), true);
+      b.blur();
+    });
     parent.appendChild(b);
     pbtn[action] = b;
     return b;
@@ -1694,7 +1702,7 @@
 
   const gNos = section("NOS");
   mkRow(gNos, "NITRO AUFFÜLLEN", "fillNos", { bind: "fillNos" });
-  const infNosBtn = mkRow(gNos, "UNBEGRENZT NOS", "infNos", { bind: "infNos", state: "AUS" });
+  const infNosBtn = mkRow(gNos, "UNBEGRENZT NOS", "infNos", { state: "AUS", mouseOnly: true });
   const detSpan = document.createElement("span");
   detSpan.textContent = " (DETECTED)";
   detSpan.style.color = "#ef4444";
@@ -1731,7 +1739,7 @@
   mkRow(gPos, "POSITION LADEN", "loadPos", { bind: "loadPos" });
 
   const gStunt = section("STUNTS");
-  const showoffBtn = mkRow(gStunt, "SHOWOFF", "showoff", { bind: "showoff", state: "AUS" });
+  const showoffBtn = mkRow(gStunt, "SHOWOFF", "showoff", { state: "AUS", mouseOnly: true });
   showoffBtn.firstChild.appendChild(detSpan.cloneNode(true));
   mkRow(gStunt, "ANTI-AFK", "hydShowoff", { state: "AUS" });
   mkRow(gStunt, "ROLLE (BARREL ROLL)", "barrel", { bind: "barrel", state: "AUS" });
